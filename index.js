@@ -79,8 +79,9 @@ app.get('/notification/:OrderId', async (req, res) => {
     }
 });
 
+const DB_URI = `mongodb+srv://solodovnikovtoni:${process.env.DB_PASSWORD}@worldpokemonapi.bladsvm.mongodb.net/worldpokemonpay?retryWrites=true&w=majority&appName=WorldpokemonAPI`
 
-mongoose.connect(process.env.DB_URI)
+mongoose.connect(DB_URI)
     .then(() => {
         console.log('Connected DB');
         app.listen("8080", () => {
