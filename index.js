@@ -80,7 +80,7 @@ app.get('/notification/:OrderId', async (req, res) => {
 });
 
 
-mongoose.connect("mongodb+srv://solodovnikovtoni:bIuvjHPz4sygKuOm@worldpokemonapi.bladsvm.mongodb.net/worldpokemonpay?retryWrites=true&w=majority&appName=WorldpokemonAPI")
+mongoose.connect(process.env.DB_URI)
     .then(() => {
         console.log('Connected DB');
         app.listen("8080", () => {
