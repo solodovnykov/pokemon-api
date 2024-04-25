@@ -80,11 +80,11 @@ app.get('/notification/:OrderId', async (req, res) => {
 });
 
 
-mongoose.connect(process.env.DB_URI)
+mongoose.connect("mongodb+srv://solodovnikovtoni:bIuvjHPz4sygKuOm@worldpokemonapi.bladsvm.mongodb.net/worldpokemonpay?retryWrites=true&w=majority&appName=WorldpokemonAPI")
     .then(() => {
         console.log('Connected DB');
-        app.listen(process.env.PORT, () => {
-            console.log(`it's running on http://localhost:${process.env.PORT}`);
+        app.listen("8080", () => {
+            console.log(`it's running on http://localhost:8080`);
         });
     })
     .catch(() => {
