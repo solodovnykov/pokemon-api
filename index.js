@@ -89,5 +89,6 @@ mongoose.connect(DB_URI)
         });
     })
     .catch(() => {
-        console.log('Connection DB failed')
+        console.log('Connection DB failed');
+        console.log(DB_URI);
     });
