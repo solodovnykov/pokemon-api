@@ -54,15 +54,26 @@ app.get('/notification/:OrderId', async (req, res) => {
         const { OrderId } = req.params;
         const paymentById = await Payment.findOne({ MERCHANT_ORDER_ID: OrderId });
 
-        const pearls = Math.round(paymentById.AMOUNT / 20);
+        
 
-        const paymentAmount = {
-            playerId: paymentById.MERCHANT_ORDER_ID,
-            moneyQuantity: paymentById.AMOUNT,
-            pearlsQuantity: pearls
+        if(paymentById) {
+            const pearls = Math.round(paymentById.AMOUNT / 20);
+
+            const paymentAmount = {
+                code: 1,
+                playerId: paymentById.MERCHANT_ORDER_ID,
+                moneyQuantity: paymentById.AMOUNT,
+                pearlsQuantity: pearls
+            }
+
+            res.status(200).json(paymentAmount);
+        } else {
+            res.status(500).json({
+                code: 0,
+                message: "user not found"
+            })
         }
-
-        res.status(200).json(paymentAmount);
+        
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
