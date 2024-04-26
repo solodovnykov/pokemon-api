@@ -52,17 +52,19 @@ app.get('/notification', async (req, res) => {
 app.get('/notification/:OrderId', async (req, res) => {
     try {
         const { OrderId } = req.params;
-        const paymentById = await Payment.findOne({ MERCHANT_ORDER_ID: OrderId });
+        const paymentById = await Payment.find({ MERCHANT_ORDER_ID: OrderId }); // []
 
-        
+        if (paymentById) {
+            const totalmoneyQuantity = paymentById.reduce((accumulator, currentValue) => {
+                return accumulator + currentValue.AMOUNT;
+            }, 0);
 
-        if(paymentById) {
-            const pearls = Math.round(paymentById.AMOUNT / 20);
+            const pearls = Math.round(totalmoneyQuantity / 20);
 
             const paymentAmount = {
                 code: 1,
-                playerId: paymentById.MERCHANT_ORDER_ID,
-                moneyQuantity: paymentById.AMOUNT,
+                playerId: paymentById[0].MERCHANT_ORDER_ID,
+                moneyQuantity: totalmoneyQuantity,
                 pearlsQuantity: pearls
             }
 
@@ -73,9 +75,9 @@ app.get('/notification/:OrderId', async (req, res) => {
                 message: "user not found"
             })
         }
-        
+
     } catch (error) {
-        res.status(500).json({ message: error.message })
+        res.status(500).json({ code: 0, message: error.message })
     }
 });
 
