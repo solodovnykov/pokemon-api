@@ -14,12 +14,12 @@ require('dotenv').config();
 const app = express();
 const upload = multer();
 
-var corsOptions = {
-    origin: 'https://api.mysite.com/',
+const corsOptions1 = {
+    origin: process.env.ORIGIN1,
     optionsSuccessStatus: 200
 };
 
-// app.use();
+app.use(cors());
 app.use(helmet());
 app.use(compression());
 app.use(hpp());
@@ -38,7 +38,7 @@ app.post('/notification', upload.none(), async (req, res) => {
     }
 });
 
-app.get('/notification', cors(corsOptions), async (req, res) => {
+app.get('/notification', cors(corsOptions1), async (req, res) => {
     try {
         const payments = await Payment.find({});
         res.status(200).json(payments);
@@ -47,7 +47,7 @@ app.get('/notification', cors(corsOptions), async (req, res) => {
     }
 });
 
-app.get('/notification/:OrderId', async (req, res) => {
+app.get('/notification/:OrderId', cors(corsOptions1), async (req, res) => {
     try {
         const { OrderId } = req.params;
         const paymentById = await Payment.find({ MERCHANT_ORDER_ID: OrderId }); // []
