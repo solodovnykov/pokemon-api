@@ -47,28 +47,40 @@ app.get('/notification', cors(corsOptions1), async (req, res) => {
     }
 });
 
-app.get('/notification/:OrderId', cors(corsOptions1), async (req, res) => {
+app.post('/notification/:OrderId', cors(corsOptions1), async (req, res) => {
     try {
-        const { OrderId } = req.params;
-        const paymentById = await Payment.find({ MERCHANT_ORDER_ID: OrderId }); // []
-        // await Payment.deleteMany({ MERCHANT_ORDER_ID: OrderId });
+        const secretKey = req.body.key;
+        console.log(req.body);
 
-        if (paymentById) {
-            const totalmoneyQuantity = paymentById.reduce((accumulator, currentValue) => {
-                return accumulator + currentValue.AMOUNT;
-            }, 0);
+        if (secretKey === process.env.SECRET_KEY) {
+            
+            const { OrderId } = req.params;
+            const paymentById = await Payment.find({ MERCHANT_ORDER_ID: OrderId }); // []
+            // await Payment.deleteMany({ MERCHANT_ORDER_ID: OrderId });
 
-            const pearls = Math.round(totalmoneyQuantity / 20);
+            if (paymentById) {
+                const totalmoneyQuantity = paymentById.reduce((accumulator, currentValue) => {
+                    return accumulator + currentValue.AMOUNT;
+                }, 0);
 
-            const paymentAmount = {
-                code: 1,
-                playerId: paymentById[0].MERCHANT_ORDER_ID,
-                moneyQuantity: totalmoneyQuantity,
-                pearlsQuantity: pearls
+                const pearls = Math.round(totalmoneyQuantity / 20);
+
+                const paymentAmount = {
+                    code: 1,
+                    playerId: paymentById[0].MERCHANT_ORDER_ID,
+                    moneyQuantity: totalmoneyQuantity,
+                    pearlsQuantity: pearls
+                }
+
+                res.status(200).json(paymentAmount);
+            } else {
+                res.status(500).json({
+                    code: 0,
+                    message: "user not found"
+                })
             }
-
-            res.status(200).json(paymentAmount);
         } else {
+            console.log("Wrong secret key");
             res.status(500).json({
                 code: 0,
                 message: "user not found"
