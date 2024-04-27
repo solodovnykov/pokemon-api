@@ -14,7 +14,12 @@ require('dotenv').config();
 const app = express();
 const upload = multer();
 
-app.use(cors());
+var corsOptions = {
+    origin: 'https://api.mysite.com/',
+    optionsSuccessStatus: 200
+};
+
+// app.use();
 app.use(helmet());
 app.use(compression());
 app.use(hpp());
@@ -23,13 +28,6 @@ app.use(mongoSanitize());
 app.use(bodyParser.json({ limit: '2kb', extended: true }))
 app.use(bodyParser.urlencoded({ limit: '1kb', extended: true }))
 app.use(bodyParser.json());
-
-
-
-app.get('/test', (req, res) => {
-    res.status(200).send("Test")
-})
-
 
 app.post('/notification', upload.none(), async (req, res) => {
     try {
@@ -40,7 +38,7 @@ app.post('/notification', upload.none(), async (req, res) => {
     }
 });
 
-app.get('/notification', async (req, res) => {
+app.get('/notification', cors(corsOptions), async (req, res) => {
     try {
         const payments = await Payment.find({});
         res.status(200).json(payments);
@@ -53,6 +51,7 @@ app.get('/notification/:OrderId', async (req, res) => {
     try {
         const { OrderId } = req.params;
         const paymentById = await Payment.find({ MERCHANT_ORDER_ID: OrderId }); // []
+        // await Payment.deleteMany({ MERCHANT_ORDER_ID: OrderId });
 
         if (paymentById) {
             const totalmoneyQuantity = paymentById.reduce((accumulator, currentValue) => {
