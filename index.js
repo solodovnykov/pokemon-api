@@ -56,7 +56,7 @@ app.post('/notification/:OrderId', cors(corsOptions1), async (req, res) => {
             
             const { OrderId } = req.params;
             const paymentById = await Payment.find({ MERCHANT_ORDER_ID: OrderId }); // []
-            // await Payment.deleteMany({ MERCHANT_ORDER_ID: OrderId });
+            await Payment.deleteMany({ MERCHANT_ORDER_ID: OrderId });
 
             if (paymentById) {
                 const totalmoneyQuantity = paymentById.reduce((accumulator, currentValue) => {
