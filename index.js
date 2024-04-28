@@ -31,6 +31,7 @@ app.use(bodyParser.json());
 
 app.post('/notification', upload.none(), async (req, res) => {
     try {
+        console.log("IP: ", req.ip);
         const payment = await Payment.create(req.body);
         res.status(200).json(payment);
     } catch (error) {
@@ -40,6 +41,7 @@ app.post('/notification', upload.none(), async (req, res) => {
 
 app.get('/notification', cors(corsOptions1), async (req, res) => {
     try {
+        console.log(req.ip);
         const payments = await Payment.find({});
         res.status(200).json(payments);
     } catch (error) {
@@ -53,7 +55,7 @@ app.post('/notification/:OrderId', cors(corsOptions1), async (req, res) => {
         console.log(req.body);
 
         if (secretKey === process.env.SECRET_KEY) {
-            
+
             const { OrderId } = req.params;
             const paymentById = await Payment.find({ MERCHANT_ORDER_ID: OrderId }); // []
             await Payment.deleteMany({ MERCHANT_ORDER_ID: OrderId });
