@@ -29,7 +29,22 @@ app.use(bodyParser.json({ limit: '2kb', extended: true }))
 app.use(bodyParser.urlencoded({ limit: '1kb', extended: true }))
 app.use(bodyParser.json());
 
-app.post('/notification', upload.none(), async (req, res) => {
+function getIP(req) {
+    return req.headers['x-real-ip'] || req.connection.remoteAddress;
+}
+
+function checkIP(req, res, next) {
+    const clientIP = getIP(req);
+    const allowedIPs = process.env.ALLOWED_IPS.split(',').map(ip => ip.trim());
+    
+    if (!allowedIPs.includes(clientIP)) {
+        return res.status(403).send('hacking attempt!');
+    }
+    
+    next();
+}
+
+app.post('/notification', upload.none(), checkIP, async (req, res) => {
     try {
         console.log("IP: ", req.headers['x-real-ip'] || req.connection.remoteAddress);
         const payment = await Payment.create(req.body);
@@ -41,7 +56,7 @@ app.post('/notification', upload.none(), async (req, res) => {
 
 app.get('/notification', cors(corsOptions1), async (req, res) => {
     try {
-        console.log(req.ip);
+        console.log(process.env.ALLOWED_IPS.split(',').map(ip => ip.trim()));
         const payments = await Payment.find({});
         res.status(200).json(payments);
     } catch (error) {
