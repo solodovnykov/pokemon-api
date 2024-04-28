@@ -41,12 +41,12 @@ function checkIP(req, res, next) {
         return res.status(403).send('hacking attempt!');
     }
     
+    console.log("This IP is supported!", clientIP);
     next();
 }
 
 app.post('/notification', upload.none(), checkIP, async (req, res) => {
     try {
-        console.log("IP: ", req.headers['x-real-ip'] || req.connection.remoteAddress);
         const payment = await Payment.create(req.body);
         res.status(200).json(payment);
     } catch (error) {
@@ -56,7 +56,6 @@ app.post('/notification', upload.none(), checkIP, async (req, res) => {
 
 app.get('/notification', cors(corsOptions1), async (req, res) => {
     try {
-        console.log(process.env.ALLOWED_IPS.split(',').map(ip => ip.trim()));
         const payments = await Payment.find({});
         res.status(200).json(payments);
     } catch (error) {
