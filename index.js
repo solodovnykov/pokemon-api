@@ -36,11 +36,11 @@ function getIP(req) {
 function checkIP(req, res, next) {
     const clientIP = getIP(req);
     const allowedIPs = process.env.ALLOWED_IPS.split(',').map(ip => ip.trim());
-    
+
     if (!allowedIPs.includes(clientIP)) {
         return res.status(403).send('hacking attempt!');
     }
-    
+
     console.log("This IP is supported!", clientIP);
     next();
 }
@@ -49,6 +49,19 @@ app.post('/notification', upload.none(), checkIP, async (req, res) => {
     try {
         const payment = await Payment.create(req.body);
         res.status(200).json(payment);
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+});
+
+app.post('/payoknotification', checkIP, async (req, res) => {
+    try {
+        await Payment.create({
+            MERCHANT_ID: req.body.shop,
+            AMOUNT: req.body.amount,
+            MERCHANT_ORDER_ID: req.body.payment_id,
+        });
+        res.send("OK").status(200);
     } catch (error) {
         res.status(500).json({ message: error.message })
     }

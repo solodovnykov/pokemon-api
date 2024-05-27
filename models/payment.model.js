@@ -27,10 +27,12 @@ const PaymentSchema = mongoose.Schema({
 
     P_EMAIL: {
         type: String,
+        default: ''
     },
 
     P_PHONE: {
         type: String,
+        default: ''
     },
 
     CUR_ID: {
