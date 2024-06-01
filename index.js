@@ -8,6 +8,7 @@ const compression = require('compression');
 const hpp = require('hpp');
 const mongoSanitize = require('express-mongo-sanitize');
 const Payment = require("./models/payment.model.js");
+const Users = require("./models/users.model.js");
 
 require('dotenv').config();
 
@@ -47,14 +48,26 @@ function checkIP(req, res, next) {
 
 app.post('/notification', upload.none(), checkIP, async (req, res) => {
     try {
-        const payment = await Payment.create(req.body);
-        res.status(200).json(payment);
+        const {MERCHANT_ID, AMOUNT, intid, MERCHANT_ORDER_ID, P_EMAIL, P_PHONE, CUR_ID, commission, SIGN, payer_account} = req.body;
+
+        const userExist = await Users.findOne({ user_id: req.body.MERCHANT_ORDER_ID });
+
+        if(userExist) {
+            const payment = await Payment.create(req.body);
+            res.status(200).json(payment);
+        } else {
+            const amountMult = Number(AMOUNT) * 1.5;
+            const payment = await Payment.create({MERCHANT_ID, AMOUNT: amountMult, intid, MERCHANT_ORDER_ID, P_EMAIL, P_PHONE, CUR_ID, commission, SIGN, payer_account});
+            await Users.create({ user_id: req.body.MERCHANT_ORDER_ID });
+            res.status(200).json(payment);
+        }
+        
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
 });
 
-app.post('/payoknotification', checkIP, async (req, res) => {
+app.post('/payoknotification', async (req, res) => {
     try {
         await Payment.create({
             MERCHANT_ID: req.body.shop,
