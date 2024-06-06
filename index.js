@@ -33,8 +33,8 @@ app.use(bodyParser.urlencoded({ limit: '1kb', extended: true }))
 app.use(bodyParser.json());
 
 const yooKassa = new YooKassa({
-    shopId: process.env.SHOP_ID_TEST,
-    secretKey: process.env.SECRET_KEY_YK_TEST
+    shopId: process.env.SHOP_ID,
+    secretKey: process.env.SECRET_KEY_YK
 });
 
 function getIP(req) {
@@ -68,7 +68,6 @@ app.post('/yookassa', async (req, res) => {
             description: req.body.userId
         });
 
-        // console.log(payment);
         res.status(200).json(payment);
     } catch (error) {
         res.status(500).json({ message: error.message })
@@ -94,7 +93,7 @@ app.post('/yookassaNotif', async (req, res) => {
 
         console.log("YK Notif");
 
-        res.status(200).json("YK Notif");
+        res.status(200).json("OK");
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
