@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const PaymentSchema = mongoose.Schema({
     MERCHANT_ID: {
         type: Number,
-        required: true,
         default: 0,
     },
 
@@ -15,7 +14,6 @@ const PaymentSchema = mongoose.Schema({
 
     intid: {
         type: Number,
-        required: true,
         default: 0,
     },
 
