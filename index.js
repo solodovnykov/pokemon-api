@@ -77,27 +77,30 @@ app.post('/yookassa', async (req, res) => {
 
 app.post('/yookassaNotif', async (req, res) => {
     try {
-        // const userExist = await Users.findOne({ user_id: req.body.description });
+        const userExist = await Users.findOne({ user_id: req.body.description });
 
-        // if (userExist) {
-        //     const payment = await Payment.create({
-        //         AMOUNT: Number(req.body.amount.value),
-        //         MERCHANT_ORDER_ID: Number(req.body.description),
-        //     });
-        //     res.status(200).json(payment);
-        // } else {
-        //     const amountMult = Number(req.body.amount.value) * 1.5;
-        //     const payment = await Payment.create({ AMOUNT: amountMult, MERCHANT_ORDER_ID: Number(req.body.description) });
-        //     await Users.create({ user_id: Number(req.body.description) });
-        //     res.status(200).json(payment);
-        // }
+        if (userExist) {
+            const payment = await Payment.create({
+                AMOUNT: Number(req.body.object.amount.value),
+                MERCHANT_ORDER_ID: Number(req.body.object.description),
+            });
+            res.status(200).json(payment);
+        } else {
+            const amountMult = Number(req.body.object.amount.value) * 1.5;
+            const payment = await Payment.create({ AMOUNT: amountMult, MERCHANT_ORDER_ID: Number(req.body.object.description) });
+            await Users.create({ user_id: Number(req.body.object.description) });
+            res.status(200).json(payment);
+        }
 
-        console.log(req.body);
+        console.log("YK Notif");
+
         res.status(200).json("YK Notif");
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
 });
+
+
 
 app.post('/notification', upload.none(), checkIP, async (req, res) => {
     try {
