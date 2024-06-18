@@ -76,9 +76,11 @@ app.post('/yookassa', async (req, res) => {
 
 app.post('/yookassaNotif', async (req, res) => {
     try {
-        const userExist = await Users.findOne({ user_id: req.body.description });
+        const userExist = await Users.findOne({ user_id: req.body.object.description });
+        
 
         if (userExist) {
+            
             const payment = await Payment.create({
                 AMOUNT: Number(req.body.object.amount.value),
                 MERCHANT_ORDER_ID: Number(req.body.object.description),
@@ -91,10 +93,9 @@ app.post('/yookassaNotif', async (req, res) => {
             res.status(200).json(payment);
         }
 
-        console.log("YK Notif");
-
-        res.status(200).json("OK");
+        
     } catch (error) {
+        console.log(req.body);
         res.status(500).json({ message: error.message })
     }
 });
