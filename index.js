@@ -11,6 +11,7 @@ const YooKassa = require('yookassa');
 
 const Payment = require("./models/payment.model.js");
 const Users = require("./models/users.model.js");
+const Tourneys = require("./models/tourneys.model.js");
 
 require('dotenv').config();
 
@@ -53,6 +54,59 @@ function checkIP(req, res, next) {
     next();
 }
 
+app.post('/tourney', cors(corsOptions1), async (req, res) => {
+    try {
+        const prizes = [req.body.prize1, req.body.prize2, req.body.prize3];
+
+        const tourneys = await Tourneys.create({
+            title: req.body.title,
+            date: req.body.date,
+            time: req.body.time,
+            location: req.body.location,
+            curator: req.body.curator,
+            pok_lvl: req.body.pok_lvl,
+            pok_count: req.body.pok_count,
+            inventory: req.body.inventory,
+            items: req.body.items,
+            prizes: prizes,
+            replacements: req.body.replacements,
+            other_text: req.body.other_text,
+            train_id: req.body.train_id,
+            train_name: req.body.train_name,
+        });
+
+        res.status(200).json(tourneys);
+    } catch (error) {
+        console.log(req.body);
+        res.status(500).json({ message: error.message })
+    }
+})
+
+app.get('/tourneys', cors(corsOptions1), async (req, res) => {
+    try {
+        const tourneys = await Tourneys.find({});
+        res.status(200).json(tourneys);
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+});
+
+app.delete('/tourney/:id', cors(corsOptions1), async (req, res) => {
+    try {
+        const id = req.params.id;
+        const deletedTourney = await Tourneys.findByIdAndDelete(id);
+
+        if (!deletedTourney) {
+            return res.status(404).json({ message: 'Not Found' });
+        }
+
+        res.status(200).json(deletedTourney);
+
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+});
+
 app.post('/yookassa', async (req, res) => {
     try {
         const payment = await yooKassa.createPayment({
@@ -77,10 +131,10 @@ app.post('/yookassa', async (req, res) => {
 app.post('/yookassaNotif', async (req, res) => {
     try {
         const userExist = await Users.findOne({ user_id: req.body.object.description });
-        
+
 
         if (userExist) {
-            
+
             const payment = await Payment.create({
                 AMOUNT: Number(req.body.object.amount.value),
                 MERCHANT_ORDER_ID: Number(req.body.object.description),
@@ -93,7 +147,7 @@ app.post('/yookassaNotif', async (req, res) => {
             res.status(200).json(payment);
         }
 
-        
+
     } catch (error) {
         console.log(req.body);
         res.status(500).json({ message: error.message })
