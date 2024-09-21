@@ -163,10 +163,17 @@ app.post('/notification', upload.none(), checkIP, async (req, res) => {
         const userExist = await Users.findOne({ user_id: req.body.MERCHANT_ORDER_ID });
 
         if (userExist) {
-            const payment = await Payment.create(req.body);
-            res.status(200).json(payment);
+            if (Number(AMOUNT) >= 5000) {
+                const amountMult = Number(AMOUNT) * 1.5;
+                const payment = await Payment.create({ MERCHANT_ID, AMOUNT: amountMult, intid, MERCHANT_ORDER_ID, P_EMAIL, P_PHONE, CUR_ID, commission, SIGN, payer_account });
+                res.status(200).json(payment);
+            } else {
+                const amountMult = Number(AMOUNT) * 1.25;
+                const payment = await Payment.create({ MERCHANT_ID, AMOUNT: amountMult, intid, MERCHANT_ORDER_ID, P_EMAIL, P_PHONE, CUR_ID, commission, SIGN, payer_account });
+                res.status(200).json(payment);
+            }
         } else {
-            const amountMult = Number(AMOUNT) * 1.5;
+            const amountMult = Number(AMOUNT) * 2;
             const payment = await Payment.create({ MERCHANT_ID, AMOUNT: amountMult, intid, MERCHANT_ORDER_ID, P_EMAIL, P_PHONE, CUR_ID, commission, SIGN, payer_account });
             await Users.create({ user_id: req.body.MERCHANT_ORDER_ID });
             res.status(200).json(payment);
