@@ -4,6 +4,7 @@ const UsersSchema = mongoose.Schema({
     user_id: {
         type: Number,
         required: true,
+        unique: true,
         default: 0,
     },
 

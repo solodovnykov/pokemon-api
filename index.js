@@ -130,18 +130,21 @@ app.post('/yookassa', async (req, res) => {
 
 app.post('/yookassaNotif', async (req, res) => {
     try {
-        const userExist = await Users.findOne({ user_id: req.body.object.description });
-
+        const userExist = await Users.findOne({ user_id: Number(req.body.object.description) });
 
         if (userExist) {
+            if (Number(req.body.object.amount.value) >= 5000) {
+                const amountMult = Number(req.body.object.amount.value) * 1.5;
+                const payment = await Payment.create({ AMOUNT: amountMult, MERCHANT_ORDER_ID: Number(req.body.object.description) });
+                res.status(200).json(payment);
+            } else {
+                const amountMult = Number(req.body.object.amount.value) * 1.25;
+                const payment = await Payment.create({ AMOUNT: amountMult, MERCHANT_ORDER_ID: Number(req.body.object.description) });
+                res.status(200).json(payment);
+            }
 
-            const payment = await Payment.create({
-                AMOUNT: Number(req.body.object.amount.value),
-                MERCHANT_ORDER_ID: Number(req.body.object.description),
-            });
-            res.status(200).json(payment);
         } else {
-            const amountMult = Number(req.body.object.amount.value) * 1.5;
+            const amountMult = Number(req.body.object.amount.value) * 2;
             const payment = await Payment.create({ AMOUNT: amountMult, MERCHANT_ORDER_ID: Number(req.body.object.description) });
             await Users.create({ user_id: Number(req.body.object.description) });
             res.status(200).json(payment);
